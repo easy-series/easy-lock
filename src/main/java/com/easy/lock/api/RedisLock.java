@@ -7,13 +7,7 @@ import org.redisson.api.RedissonClient;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-/**
- * <p>
- *
- * </p>
- *
- * @author zhonghuashishan
- */
+
 @Slf4j
 public class RedisLock {
 
