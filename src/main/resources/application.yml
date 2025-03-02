@@ -19,6 +19,8 @@ spring:
         max-idle: 8
         # 连接池中的最小空闲连接
         min-idle: 0
+  application:
+    name: easy-lock-demo
 
 # 应用服务端口配置
 server:
@@ -27,4 +29,20 @@ server:
 # 日志配置
 logging:
   level:
-    com.easy.lock: debug 
+    com.easy.lock: debug
+
+# 分布式锁配置
+easy:
+  lock:
+    enabled: true
+    prefix: lock
+    wait-time: 3000
+    lease-time: 30000
+    time-unit: MILLISECONDS
+    redis:
+      address: redis://127.0.0.1:6379
+      password: ${REDIS_PASSWORD:}
+      database: 0
+      pool-size: 64
+      min-idle: 24
+      connect-timeout: 10000 

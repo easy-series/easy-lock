@@ -1,24 +1,45 @@
 package com.easy.lock.config;
 
-import com.easy.lock.api.RedisLock;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.StringUtils;
+
+import com.easy.lock.api.RedisLock;
+
+import lombok.RequiredArgsConstructor;
 
 @Configuration
+@RequiredArgsConstructor
+@EnableConfigurationProperties(LockProperties.class)
+@ConditionalOnProperty(prefix = "easy.lock", name = "enabled", havingValue = "true", matchIfMissing = true)
 public class RedissonConfig {
+
+    private final LockProperties lockProperties;
 
     @Bean
     public RedissonClient redissonClient() {
         Config config = new Config();
-        // 单节点模式，设置redis地址，根据实际情况修改
+        LockProperties.Redis redis = lockProperties.getRedis();
+
+        // 单节点模式
         config.useSingleServer()
-                .setAddress("redis://127.0.0.1:6379")
-                .setPassword("123456")
-                .setDatabase(0);
+                .setAddress(redis.getAddress())
+                .setDatabase(redis.getDatabase())
+                .setConnectionPoolSize(redis.getPoolSize())
+                .setConnectionMinimumIdleSize(redis.getMinIdle())
+                .setConnectTimeout(redis.getConnectTimeout());
+
+        // 设置密码（如果有）
+        if (StringUtils.hasText(redis.getPassword())) {
+            config.useSingleServer().setPassword(redis.getPassword());
+        }
+
         return Redisson.create(config);
     }
 
@@ -27,4 +48,4 @@ public class RedissonConfig {
     public RedisLock redisLock(RedissonClient redissonClient) {
         return new RedisLock(redissonClient);
     }
-} 
+}

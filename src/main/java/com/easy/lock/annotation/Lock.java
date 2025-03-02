@@ -1,6 +1,10 @@
 package com.easy.lock.annotation;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -12,11 +16,13 @@ import java.util.concurrent.TimeUnit;
 public @interface Lock {
     /**
      * 锁的key前缀
+     * 默认使用配置文件中的prefix值
      */
-    String prefix() default "lock";
+    String prefix() default "";
 
     /**
      * 锁的key，支持 SpEL 表达式
+     * 如果不指定，将使用类名:方法名作为key
      */
     String key() default "";
 
@@ -31,19 +37,27 @@ public @interface Lock {
     LockType type() default LockType.TRY_LOCK;
 
     /**
-     * 等待获取锁的时间，默认3秒
-     * 仅在type为TRY_LOCK时生效
+     * 锁模式
      */
-    long waitTime() default 3000L;
+    LockMode mode() default LockMode.WRITE;
 
     /**
-     * 持有锁的时间，默认30秒
+     * 等待获取锁的时间
+     * 默认使用配置文件中的waitTime值
      * 仅在type为TRY_LOCK时生效
      */
-    long leaseTime() default 30000L;
+    long waitTime() default -1L;
 
     /**
-     * 时间单位，默认毫秒
+     * 持有锁的时间
+     * 默认使用配置文件中的leaseTime值
+     * 仅在type为TRY_LOCK时生效
+     */
+    long leaseTime() default -1L;
+
+    /**
+     * 时间单位
+     * 默认使用配置文件中的timeUnit值
      */
     TimeUnit timeUnit() default TimeUnit.MILLISECONDS;
 
@@ -55,15 +69,30 @@ public @interface Lock {
          * 尝试获取锁（带超时）
          */
         TRY_LOCK,
-        
+
         /**
          * 永久锁（自动续期）
          */
         LOCK,
-        
+
         /**
          * 联锁（多个key）
          */
         MULTI_LOCK
     }
-} 
+
+    /**
+     * 锁模式枚举
+     */
+    enum LockMode {
+        /**
+         * 写锁（排他锁）
+         */
+        WRITE,
+
+        /**
+         * 读锁（共享锁）
+         */
+        READ
+    }
+}
