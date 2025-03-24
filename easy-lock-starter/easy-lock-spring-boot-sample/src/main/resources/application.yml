@@ -1,0 +1,55 @@
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL
+    username: sa
+    password: 
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  redis:
+    host: localhost
+    port: 6379
+    password: 123456
+    database: 0
+    timeout: 3000
+    lettuce:
+      pool:
+        max-active: 64
+        max-idle: 32
+        min-idle: 8
+        max-wait: 3000
+
+application:
+  name: easy-lock-sample
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.easy.lock: debug
+    org.redisson: debug
+
+easy:
+  lock:
+    enabled: true
+    prefix: "easy-lock:"
+    wait-time: 3000
+    lease-time: 30000
+    time-unit: MILLISECONDS
+    lock-type: REDIS
+    retry:
+      enabled: true
+      max-retries: 3
+      retry-interval: 1000
+      retry-strategy: EXPONENTIAL
+    redis:
+      address: redis://localhost:6379
+      password: 123456
+      database: 0
+    jdbc:
+      table-name: distributed_lock
+      create-table: true
+      expire-time: 60000 

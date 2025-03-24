@@ -1,0 +1,37 @@
+# 测试环境配置
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+  redis:
+    host: localhost
+    port: 6379
+    password: 123456
+    database: 0
+    timeout: 3000
+
+# 分布式锁配置
+easy:
+  lock:
+    enabled: true
+    prefix: easy_lock_test
+    wait-time: 3000
+    lease-time: 5000
+    lock-type: REDIS  # 使用Redis锁
+    redis:
+      address: redis://localhost:6379
+      password: 123456
+      database: 0
+    retry:
+      enabled: true
+      max-retries: 3
+      retry-interval: 1000
+      retry-strategy: EXPONENTIAL
+
+# 测试配置
+logging:
+  level:
+    com.easy.lock: DEBUG
+    org.redisson: INFO 
